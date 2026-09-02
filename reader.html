@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tajweed reader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:wght@400;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--rule:#DCD6C6;--ink:#1B1A17;--paper:#FDFCF8;--gold:#B08C3A;--hl:#FFF3CE;--bar:64px;--ar-base:27px;--scale:1;--ar:calc(var(--ar-base) * var(--scale))}
+*{box-sizing:border-box}
+body{margin:0;background:#EDEAE1;font-family:"Work Sans",system-ui,sans-serif;color:var(--ink)}
+
+.bar{position:sticky;top:0;z-index:20;background:#12312A;color:#EDE8DA;padding:13px 22px;
+  display:flex;gap:20px;align-items:center;flex-wrap:wrap;font-size:15.5px}
+.bar strong{font-weight:600;letter-spacing:.04em;font-size:16.5px}
+.bar input[type=checkbox]{width:15px;height:15px}
+.bar label{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.bar .sp{flex:1}
+.nav{display:flex;gap:8px;align-items:center}
+.bar select{
+  background:#1B4A3E;color:#EDE8DA;border:1px solid rgba(224,206,147,.35);
+  border-radius:4px;padding:7px 10px;font:inherit;font-size:15px;cursor:pointer;
+  max-width:250px;
+}
+.bar select:focus{outline:2px solid var(--gold);outline-offset:1px}
+.here{font-size:14.5px;color:#9FB3A9;white-space:nowrap}
+.credit{
+  margin-left:auto;align-self:flex-end;
+  font-size:12.5px;color:#3E7361;text-decoration:none;white-space:nowrap;
+  transition:color .15s ease;
+}
+.credit:hover{color:#7FA394}
+
+/* small ? that explains a toggle */
+.hint{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:17px;height:17px;border-radius:50%;flex:0 0 17px;
+  border:1px solid rgba(224,206,147,.55);color:#E4CE93;
+  font-size:11.5px;font-weight:600;cursor:help;position:relative;margin-left:-12px;
+}
+.hint:hover,.hint:focus{background:rgba(224,206,147,.16);outline:none}
+.hint::after{
+  content:attr(data-tip);position:absolute;top:26px;left:50%;
+  transform:translateX(-50%) translateY(-4px);
+  width:290px;background:#0B211C;color:#DCD8CB;
+  border:1px solid rgba(224,206,147,.3);border-radius:5px;
+  padding:10px 12px;font-size:13px;font-weight:400;line-height:1.5;
+  text-align:left;white-space:normal;letter-spacing:0;
+  opacity:0;visibility:hidden;transition:opacity .14s ease, transform .14s ease;
+  box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:30;
+}
+.hint:hover::after,.hint:focus::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+
+.msg{text-align:center;color:#8A8578;font-size:15px;padding:60px 20px}
+.page{display:flex;background:var(--paper);width:210mm;
+  content-visibility:auto;contain-intrinsic-size:auto 1200px;
+  margin:26px auto;box-shadow:0 2px 18px rgba(0,0,0,.14);scroll-margin-top:calc(var(--bar) + 16px)}
+
+.margin{width:48mm;flex:0 0 48mm;border-left:1px solid var(--rule);
+  padding:15mm 6mm 12mm;background:#FAF8F1}
+.key{
+  position:sticky;top:calc(var(--bar) + 14px);
+  max-height:calc(100vh - var(--bar) - 42px);
+  overflow-y:auto;scroll-behavior:smooth;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.key::-webkit-scrollbar{display:none}
+.margin-head{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);
+  font-weight:600;border-bottom:1px solid var(--rule);padding-bottom:6px;margin-bottom:10px;
+  position:sticky;top:0;background:#FAF8F1;z-index:2}
+.margin-head span{display:block;color:#9A958A;letter-spacing:.07em;font-weight:400;margin-top:2px}
+.legend{list-style:none;margin:0;padding:0 2px}
+.leg{display:flex;gap:7px;padding:6px 4px;border-bottom:1px dotted var(--rule);
+  cursor:default;border-radius:3px;transition:background .14s ease}
+.sw{flex:0 0 9px;height:9px;margin-top:4px;border-radius:2px}
+.leg-txt b{display:block;font-size:11px;font-weight:600;line-height:1.25}
+.leg-txt i{display:block;font-family:Amiri,serif;font-style:normal;font-size:13.5px;
+  color:#4A473F;line-height:1.3;direction:rtl}
+.leg-txt em{display:block;font-style:normal;font-size:9.5px;color:#7C776B;line-height:1.35;margin-top:2px}
+.leg.hit-leg{background:var(--hl)}
+
+.sheet{flex:1;padding:15mm 12mm 15mm;display:flex;flex-direction:column;min-width:0}
+.page-head{display:flex;align-items:baseline;gap:10px;font-size:11px;color:#8A8578;
+  border-bottom:1px solid var(--rule);padding-bottom:8px;letter-spacing:.08em;
+  position:sticky;top:var(--bar);background:var(--paper);padding-top:6px;z-index:5}
+.page-head .surah-en{font-weight:600;color:#4A473F;text-transform:uppercase}
+.page-head .surah-ar{font-family:Amiri,serif;font-size:17px;color:var(--gold)}
+.page-head .rng{margin-left:auto}
+
+.mushaf{font-family:"Amiri Quran",Amiri,serif;font-size:var(--ar);line-height:2.3;
+  text-align:justify;padding-top:9mm;transition:font-size .15s ease}
+.ayah{display:inline;scroll-margin-top:calc(var(--bar) + 90px)}
+.ayah-num{font-family:Amiri,serif;font-size:.6em;color:var(--gold);
+  border:1px solid var(--gold);border-radius:50%;display:inline-block;
+  width:1.7em;height:1.7em;line-height:1.6em;text-align:center;
+  margin:0 .2em;vertical-align:.15em}
+.ayah.pinged .ayah-num{background:var(--hl)}
+
+/* word by word transliteration, only when the toggle is on */
+.w{display:inline}
+.wt{display:none}
+body.show-tl .mushaf{text-align:right;line-height:1.6}
+body.show-tl .ayah{display:block;margin-bottom:2em}
+body.show-tl .w{
+  display:inline-flex;flex-direction:column;align-items:center;
+  vertical-align:top;margin:0 .22em 1.5em;
+}
+body.show-tl .wt{
+  display:block;direction:ltr;
+  font-family:"Work Sans",system-ui,sans-serif;
+  font-size:calc(var(--ar) * 0.42);line-height:1.35;
+  color:#8A8478;margin-top:calc(var(--ar) * 0.34);white-space:nowrap;
+}
+
+.r-madd_6{color:#D40D0D}
+.r-madd_muttasil{color:#F2700A}
+.r-madd_munfasil{color:#D9A106}
+.r-madd_246{color:#A87908}
+.r-madd_2{color:#4A4740}
+.r-ghunnah{color:#00A15E}
+.r-idghaam_ghunnah{color:#00A9A0}
+.r-idghaam_no_ghunnah{color:#6D6AE0}
+.r-idghaam_shafawi{color:#A32EDB}
+.r-idghaam_mutajanisayn{color:#A32EDB}
+.r-idghaam_mutaqaribayn{color:#A32EDB}
+.r-ikhfa{color:#0090C8}
+.r-ikhfa_shafawi{color:#47B6E0}
+.r-iqlab{color:#E01FA8}
+.r-qalqalah{color:#0A2FD6}
+.r-hamzat_wasl{color:#8E959B}
+.r-lam_shamsiyyah{color:#8E959B}
+.r-silent{color:#B9BFC4}
+
+/* toggles */
+body.hide-madd2 .r-madd_2{color:inherit}
+body.hide-madd2 .leg[data-rule="madd_2"]{display:none}
+body.plain .mushaf span[class^="r-"]{color:inherit}
+body.plain .legend{opacity:.25}
+
+@media print{
+  body{background:#fff}
+  .bar{display:none}
+  .page{margin:0;box-shadow:none;page-break-after:always;width:auto}
+  .page-head,.margin-head,.legend{position:static}
+  @page{size:A4 portrait;margin:0}
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <strong>Tajweed reader</strong>
+  <div class="nav">
+    <select id="sel-surah" aria-label="Surah">
+<option value="1">1. Al-Fatihah &middot; الفاتحة</option>
+<option value="2">2. Al-Baqarah &middot; البقرة</option>
+<option value="3">3. Ali 'Imran &middot; آل عمران</option>
+<option value="4">4. An-Nisa &middot; النساء</option>
+<option value="5">5. Al-Ma'idah &middot; المائدة</option>
+<option value="6">6. Al-An'am &middot; الأنعام</option>
+<option value="7">7. Al-A'raf &middot; الأعراف</option>
+<option value="8">8. Al-Anfal &middot; الأنفال</option>
+<option value="9">9. At-Tawbah &middot; التوبة</option>
+<option value="10">10. Yunus &middot; يونس</option>
+<option value="11">11. Hud &middot; هود</option>
+<option value="12">12. Yusuf &middot; يوسف</option>
+<option value="13">13. Ar-Ra'd &middot; الرعد</option>
+<option value="14">14. Ibrahim &middot; ابراهيم</option>
+<option value="15">15. Al-Hijr &middot; الحجر</option>
+<option value="16">16. An-Nahl &middot; النحل</option>
+<option value="17">17. Al-Isra &middot; الإسراء</option>
+<option value="18">18. Al-Kahf &middot; الكهف</option>
+<option value="19">19. Maryam &middot; مريم</option>
+<option value="20">20. Taha &middot; طه</option>
+<option value="21">21. Al-Anbya &middot; الأنبياء</option>
+<option value="22">22. Al-Hajj &middot; الحج</option>
+<option value="23">23. Al-Mu'minun &middot; المؤمنون</option>
+<option value="24">24. An-Nur &middot; النور</option>
+<option value="25">25. Al-Furqan &middot; الفرقان</option>
+<option value="26">26. Ash-Shu'ara &middot; الشعراء</option>
+<option value="27">27. An-Naml &middot; النمل</option>
+<option value="28">28. Al-Qasas &middot; القصص</option>
+<option value="29">29. Al-'Ankabut &middot; العنكبوت</option>
+<option value="30">30. Ar-Rum &middot; الروم</option>
+<option value="31">31. Luqman &middot; لقمان</option>
+<option value="32">32. As-Sajdah &middot; السجدة</option>
+<option value="33">33. Al-Ahzab &middot; الأحزاب</option>
+<option value="34">34. Saba &middot; سبإ</option>
+<option value="35">35. Fatir &middot; فاطر</option>
+<option value="36">36. Ya-Sin &middot; يس</option>
+<option value="37">37. As-Saffat &middot; الصافات</option>
+<option value="38">38. Sad &middot; ص</option>
+<option value="39">39. Az-Zumar &middot; الزمر</option>
+<option value="40">40. Ghafir &middot; غافر</option>
+<option value="41">41. Fussilat &middot; فصلت</option>
+<option value="42">42. Ash-Shuraa &middot; الشورى</option>
+<option value="43">43. Az-Zukhruf &middot; الزخرف</option>
+<option value="44">44. Ad-Dukhan &middot; الدخان</option>
+<option value="45">45. Al-Jathiyah &middot; الجاثية</option>
+<option value="46">46. Al-Ahqaf &middot; الأحقاف</option>
+<option value="47">47. Muhammad &middot; محمد</option>
+<option value="48">48. Al-Fath &middot; الفتح</option>
+<option value="49">49. Al-Hujurat &middot; الحجرات</option>
+<option value="50">50. Qaf &middot; ق</option>
+<option value="51">51. Adh-Dhariyat &middot; الذاريات</option>
+<option value="52">52. At-Tur &middot; الطور</option>
+<option value="53">53. An-Najm &middot; النجم</option>
+<option value="54">54. Al-Qamar &middot; القمر</option>
+<option value="55">55. Ar-Rahman &middot; الرحمن</option>
+<option value="56">56. Al-Waqi'ah &middot; الواقعة</option>
+<option value="57">57. Al-Hadid &middot; الحديد</option>
+<option value="58">58. Al-Mujadila &middot; المجادلة</option>
+<option value="59">59. Al-Hashr &middot; الحشر</option>
+<option value="60">60. Al-Mumtahanah &middot; الممتحنة</option>
+<option value="61">61. As-Saf &middot; الصف</option>
+<option value="62">62. Al-Jumu'ah &middot; الجمعة</option>
+<option value="63">63. Al-Munafiqun &middot; المنافقون</option>
+<option value="64">64. At-Taghabun &middot; التغابن</option>
+<option value="65">65. At-Talaq &middot; الطلاق</option>
+<option value="66">66. At-Tahrim &middot; التحريم</option>
+<option value="67">67. Al-Mulk &middot; الملك</option>
+<option value="68">68. Al-Qalam &middot; القلم</option>
+<option value="69">69. Al-Haqqah &middot; الحاقة</option>
+<option value="70">70. Al-Ma'arij &middot; المعارج</option>
+<option value="71">71. Nuh &middot; نوح</option>
+<option value="72">72. Al-Jinn &middot; الجن</option>
+<option value="73">73. Al-Muzzammil &middot; المزمل</option>
+<option value="74">74. Al-Muddaththir &middot; المدثر</option>
+<option value="75">75. Al-Qiyamah &middot; القيامة</option>
+<option value="76">76. Al-Insan &middot; الانسان</option>
+<option value="77">77. Al-Mursalat &middot; المرسلات</option>
+<option value="78">78. An-Naba &middot; النبإ</option>
+<option value="79">79. An-Nazi'at &middot; النازعات</option>
+<option value="80">80. 'Abasa &middot; عبس</option>
+<option value="81">81. At-Takwir &middot; التكوير</option>
+<option value="82">82. Al-Infitar &middot; الإنفطار</option>
+<option value="83">83. Al-Mutaffifin &middot; المطففين</option>
+<option value="84">84. Al-Inshiqaq &middot; الإنشقاق</option>
+<option value="85">85. Al-Buruj &middot; البروج</option>
+<option value="86">86. At-Tariq &middot; الطارق</option>
+<option value="87">87. Al-A'la &middot; الأعلى</option>
+<option value="88">88. Al-Ghashiyah &middot; الغاشية</option>
+<option value="89">89. Al-Fajr &middot; الفجر</option>
+<option value="90">90. Al-Balad &middot; البلد</option>
+<option value="91">91. Ash-Shams &middot; الشمس</option>
+<option value="92">92. Al-Layl &middot; الليل</option>
+<option value="93">93. Ad-Duhaa &middot; الضحى</option>
+<option value="94">94. Ash-Sharh &middot; الشرح</option>
+<option value="95">95. At-Tin &middot; التين</option>
+<option value="96">96. Al-'Alaq &middot; العلق</option>
+<option value="97">97. Al-Qadr &middot; القدر</option>
+<option value="98">98. Al-Bayyinah &middot; البينة</option>
+<option value="99">99. Az-Zalzalah &middot; الزلزلة</option>
+<option value="100">100. Al-'Adiyat &middot; العاديات</option>
+<option value="101">101. Al-Qari'ah &middot; القارعة</option>
+<option value="102">102. At-Takathur &middot; التكاثر</option>
+<option value="103">103. Al-'Asr &middot; العصر</option>
+<option value="104">104. Al-Humazah &middot; الهمزة</option>
+<option value="105">105. Al-Fil &middot; الفيل</option>
+<option value="106">106. Quraysh &middot; قريش</option>
+<option value="107">107. Al-Ma'un &middot; الماعون</option>
+<option value="108">108. Al-Kawthar &middot; الكوثر</option>
+<option value="109">109. Al-Kafirun &middot; الكافرون</option>
+<option value="110">110. An-Nasr &middot; النصر</option>
+<option value="111">111. Al-Masad &middot; المسد</option>
+<option value="112">112. Al-Ikhlas &middot; الإخلاص</option>
+<option value="113">113. Al-Falaq &middot; الفلق</option>
+<option value="114">114. An-Nas &middot; الناس</option>
+    </select>
+    <select id="sel-ayah" aria-label="Ayah"></select>
+  </div>
+  <span class="here" id="here"></span>
+  <label>Size
+    <select id="sel-size" aria-label="Text size">
+      <option value="0.75">75%</option>
+      <option value="0.9">90%</option>
+      <option value="1" selected>100%</option>
+      <option value="1.25">125%</option>
+      <option value="1.5">150%</option>
+      <option value="1.75">175%</option>
+      <option value="2">200%</option>
+      <option value="2.5">250%</option>
+    </select>
+  </label>
+  <span class="sp"></span>
+  <label><input type="checkbox" id="t-madd2" checked> natural madd</label>
+  <span class="hint" tabindex="0" data-tip="Madd tabee&#39;i is the plain two count stretch on alif, waw and yaa with no hamza or sukoon after it. It turns up in almost every line, so colouring it can bury the rules that need a decision. Untick to leave it black and keep the page calmer.">?</span>
+  <label><input type="checkbox" id="t-plain"> plain text</label>
+  <label><input type="checkbox" id="t-tl"> transliteration</label>
+  <label><input type="checkbox" id="t-hover" checked> highlight key on hover</label>
+  <a class="credit" href="https://sporkbots.stream/" target="_blank" rel="noopener">Website and reader by SporkTeam</a>
+</div>
+
+<main id="view"></main>
+<p id="msg" class="msg">Loading&hellip;</p>
+
+<script>
+const b = document.body;
+const AYAH_COUNTS = {"1": 7, "2": 286, "3": 200, "4": 176, "5": 120, "6": 165, "7": 206, "8": 75, "9": 129, "10": 109, "11": 123, "12": 111, "13": 43, "14": 52, "15": 99, "16": 128, "17": 111, "18": 110, "19": 98, "20": 135, "21": 112, "22": 78, "23": 118, "24": 64, "25": 77, "26": 227, "27": 93, "28": 88, "29": 69, "30": 60, "31": 34, "32": 30, "33": 73, "34": 54, "35": 45, "36": 83, "37": 182, "38": 88, "39": 75, "40": 85, "41": 54, "42": 53, "43": 89, "44": 59, "45": 37, "46": 35, "47": 38, "48": 29, "49": 18, "50": 45, "51": 60, "52": 49, "53": 62, "54": 55, "55": 78, "56": 96, "57": 29, "58": 22, "59": 24, "60": 13, "61": 14, "62": 11, "63": 11, "64": 18, "65": 12, "66": 12, "67": 30, "68": 52, "69": 52, "70": 44, "71": 28, "72": 28, "73": 20, "74": 56, "75": 40, "76": 31, "77": 50, "78": 40, "79": 46, "80": 42, "81": 29, "82": 19, "83": 36, "84": 25, "85": 22, "86": 17, "87": 19, "88": 26, "89": 30, "90": 20, "91": 15, "92": 21, "93": 11, "94": 8, "95": 8, "96": 19, "97": 5, "98": 8, "99": 8, "100": 11, "101": 11, "102": 8, "103": 3, "104": 9, "105": 5, "106": 4, "107": 7, "108": 3, "109": 6, "110": 3, "111": 5, "112": 4, "113": 5, "114": 6};
+const SURAH_NAMES = {"1": "Al-Fatihah", "2": "Al-Baqarah", "3": "Ali 'Imran", "4": "An-Nisa", "5": "Al-Ma'idah", "6": "Al-An'am", "7": "Al-A'raf", "8": "Al-Anfal", "9": "At-Tawbah", "10": "Yunus", "11": "Hud", "12": "Yusuf", "13": "Ar-Ra'd", "14": "Ibrahim", "15": "Al-Hijr", "16": "An-Nahl", "17": "Al-Isra", "18": "Al-Kahf", "19": "Maryam", "20": "Taha", "21": "Al-Anbya", "22": "Al-Hajj", "23": "Al-Mu'minun", "24": "An-Nur", "25": "Al-Furqan", "26": "Ash-Shu'ara", "27": "An-Naml", "28": "Al-Qasas", "29": "Al-'Ankabut", "30": "Ar-Rum", "31": "Luqman", "32": "As-Sajdah", "33": "Al-Ahzab", "34": "Saba", "35": "Fatir", "36": "Ya-Sin", "37": "As-Saffat", "38": "Sad", "39": "Az-Zumar", "40": "Ghafir", "41": "Fussilat", "42": "Ash-Shuraa", "43": "Az-Zukhruf", "44": "Ad-Dukhan", "45": "Al-Jathiyah", "46": "Al-Ahqaf", "47": "Muhammad", "48": "Al-Fath", "49": "Al-Hujurat", "50": "Qaf", "51": "Adh-Dhariyat", "52": "At-Tur", "53": "An-Najm", "54": "Al-Qamar", "55": "Ar-Rahman", "56": "Al-Waqi'ah", "57": "Al-Hadid", "58": "Al-Mujadila", "59": "Al-Hashr", "60": "Al-Mumtahanah", "61": "As-Saf", "62": "Al-Jumu'ah", "63": "Al-Munafiqun", "64": "At-Taghabun", "65": "At-Talaq", "66": "At-Tahrim", "67": "Al-Mulk", "68": "Al-Qalam", "69": "Al-Haqqah", "70": "Al-Ma'arij", "71": "Nuh", "72": "Al-Jinn", "73": "Al-Muzzammil", "74": "Al-Muddaththir", "75": "Al-Qiyamah", "76": "Al-Insan", "77": "Al-Mursalat", "78": "An-Naba", "79": "An-Nazi'at", "80": "'Abasa", "81": "At-Takwir", "82": "Al-Infitar", "83": "Al-Mutaffifin", "84": "Al-Inshiqaq", "85": "Al-Buruj", "86": "At-Tariq", "87": "Al-A'la", "88": "Al-Ghashiyah", "89": "Al-Fajr", "90": "Al-Balad", "91": "Ash-Shams", "92": "Al-Layl", "93": "Ad-Duhaa", "94": "Ash-Sharh", "95": "At-Tin", "96": "Al-'Alaq", "97": "Al-Qadr", "98": "Al-Bayyinah", "99": "Az-Zalzalah", "100": "Al-'Adiyat", "101": "Al-Qari'ah", "102": "At-Takathur", "103": "Al-'Asr", "104": "Al-Humazah", "105": "Al-Fil", "106": "Quraysh", "107": "Al-Ma'un", "108": "Al-Kawthar", "109": "Al-Kafirun", "110": "An-Nasr", "111": "Al-Masad", "112": "Al-Ikhlas", "113": "Al-Falaq", "114": "An-Nas"};
+// remembers settings and place. falls back to a cookie, then to nothing
+const store = {
+  key: 'tajweed-reader',
+  read() {
+    try {
+      const v = localStorage.getItem(this.key);
+      if (v) return JSON.parse(v);
+    } catch (e) {}
+    try {
+      const hit = document.cookie.split(';')
+        .map(c => c.trim())
+        .find(c => c.indexOf(this.key + '=') === 0);
+      if (hit) return JSON.parse(decodeURIComponent(hit.slice(this.key.length + 1)));
+    } catch (e) {}
+    return null;
+  },
+  write(o) {
+    const v = JSON.stringify(o);
+    try { localStorage.setItem(this.key, v); return; } catch (e) {}
+    try {
+      document.cookie = this.key + '=' + encodeURIComponent(v) +
+        ';path=/;max-age=' + (60 * 60 * 24 * 365) + ';SameSite=Lax';
+    } catch (e) {}
+  }
+};
+let state = store.read() || {};
+let saveTimer = null;
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => store.write(state), 400);
+}
+
+const selS = document.getElementById('sel-surah');
+const selA = document.getElementById('sel-ayah');
+const here = document.getElementById('here');
+let syncing = false;
+
+document.getElementById('t-madd2').addEventListener('change', e => {
+  b.classList.toggle('hide-madd2', !e.target.checked);
+  state.madd2 = e.target.checked; save();
+});
+document.getElementById('t-plain').addEventListener('change', e => {
+  b.classList.toggle('plain', e.target.checked);
+  state.plain = e.target.checked; save();
+});
+document.getElementById('t-tl').addEventListener('change', e => {
+  b.classList.toggle('show-tl', e.target.checked);
+  state.tl = e.target.checked; save();
+});
+document.getElementById('t-hover').addEventListener('change', e => {
+  b.classList.toggle('no-hover', !e.target.checked);
+  state.hover = e.target.checked; save();
+  if (!e.target.checked) document.querySelectorAll('.hit-leg')
+    .forEach(n => n.classList.remove('hit-leg'));
+});
+
+// fill the ayah list for a surah, keeping the chosen one if it still exists
+function fillAyahs(sid, keep) {
+  const n = AYAH_COUNTS[sid] || 0;
+  const want = keep && keep <= n ? keep : 1;
+  selA.innerHTML = '';
+  for (let i = 1; i <= n; i++) {
+    const o = document.createElement('option');
+    o.value = i;
+    o.textContent = 'Ayah ' + i;
+    selA.appendChild(o);
+  }
+  selA.value = want;
+}
+
+function goTo(sid, ayah, smooth) {
+  const el = document.getElementById('a' + sid + '-' + ayah);
+  if (!el) return;
+  syncing = true;
+  el.scrollIntoView({ behavior: smooth === false ? 'auto' : 'smooth', block: 'center' });
+  el.classList.add('pinged');
+  setTimeout(() => el.classList.remove('pinged'), 1400);
+  setTimeout(() => { syncing = false; }, 700);
+}
+
+selS.addEventListener('change', () => {
+  const sid = +selS.value;
+  fillAyahs(sid, 1);
+  state.s = sid; state.a = 1; save();
+  window.scrollTo(0, 0);
+  loadSurah(sid, 1);
+});
+selA.addEventListener('change', () => goTo(+selS.value, +selA.value));
+
+const view = document.getElementById('view');
+const msg = document.getElementById('msg');
+const cache = new Map();
+let io = null;
+
+function wire(page) {
+  const m = page.querySelector('.mushaf');
+  const clear = () => page.querySelectorAll('.hit-leg')
+                          .forEach(n => n.classList.remove('hit-leg'));
+  m.addEventListener('mouseover', e => {
+    if (b.classList.contains('no-hover')) return;
+    const t = e.target.closest('[data-rule]');
+    clear();
+    if (!t) return;
+    const leg = page.querySelector('.leg[data-rule="' + t.dataset.rule + '"]');
+    if (!leg) return;
+    leg.classList.add('hit-leg');
+    const key = page.querySelector('.key');
+    const kb = key.getBoundingClientRect(), lb = leg.getBoundingClientRect();
+    if (lb.top < kb.top + 28) key.scrollTop -= (kb.top + 28 - lb.top);
+    else if (lb.bottom > kb.bottom - 6) key.scrollTop += (lb.bottom - kb.bottom + 6);
+  });
+  m.addEventListener('mouseleave', clear);
+
+  // follow the reader down the page and keep the dropdowns in step
+  if (io) io.disconnect();
+  const seen = new Map();
+  io = new IntersectionObserver(entries => {
+    entries.forEach(e => seen.set(e.target, e.isIntersecting ? e.intersectionRatio : 0));
+    let best = null, bestR = 0;
+    seen.forEach((r, el) => { if (r > bestR) { bestR = r; best = el; } });
+    if (!best || syncing) return;
+    const sid = +best.dataset.s, ayah = +best.dataset.a;
+    selA.value = ayah;
+    state.s = sid; state.a = ayah; save();
+    here.textContent = (SURAH_NAMES[sid] || '') + '  ' + sid + ':' + ayah;
+  }, { rootMargin: '-25% 0px -55% 0px', threshold: [0, .25, .5, 1] });
+  page.querySelectorAll('.ayah').forEach(a => io.observe(a));
+}
+
+async function loadSurah(sid, ayah) {
+  if (cache.has(sid)) {
+    view.innerHTML = cache.get(sid);
+  } else {
+    msg.textContent = 'Loading surah ' + sid + '…';
+    msg.style.display = 'block';
+    try {
+      const r = await fetch('surahs/' + sid + '.html');
+      if (!r.ok) throw new Error(r.status);
+      const html = await r.text();
+      cache.set(sid, html);
+      view.innerHTML = html;
+    } catch (e) {
+      msg.textContent = 'Could not load surah ' + sid +
+        '. Open this page over http, not as a local file.';
+      return;
+    }
+  }
+  msg.style.display = 'none';
+  const page = view.querySelector('.page');
+  if (page) wire(page);
+  if (ayah) goTo(sid, ayah, false);
+}
+
+function restore() {
+  const set = (id, on) => {
+    const el = document.getElementById(id);
+    if (el.checked !== on) { el.checked = on; el.dispatchEvent(new Event('change')); }
+  };
+  if (state.madd2 === false) set('t-madd2', false);
+  if (state.plain === true) set('t-plain', true);
+  if (state.tl === true) set('t-tl', true);
+  if (state.hover === false) set('t-hover', false);
+  if (state.scale) {
+    const sel = document.getElementById('sel-size');
+    sel.value = state.scale;
+    document.documentElement.style.setProperty('--scale', state.scale);
+  }
+  const sid = state.s && AYAH_COUNTS[state.s] ? state.s : +selS.value;
+  const ayah = state.s === sid && state.a ? state.a : 1;
+  selS.value = sid;
+  fillAyahs(sid, ayah);
+  loadSurah(sid, ayah);
+}
+
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(restore);
+else window.addEventListener('load', restore);
+</script>
+</body>
+</html>
