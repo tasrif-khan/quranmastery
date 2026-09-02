@@ -354,6 +354,10 @@ document.getElementById('t-hover').addEventListener('change', e => {
   if (!e.target.checked) document.querySelectorAll('.hit-leg')
     .forEach(n => n.classList.remove('hit-leg'));
 });
+document.getElementById('sel-size').addEventListener('change', e => {
+  document.documentElement.style.setProperty('--scale', e.target.value);
+  state.scale = e.target.value; save();
+});
 
 // fill the ayah list for a surah, keeping the chosen one if it still exists
 function fillAyahs(sid, keep) {
@@ -510,10 +514,13 @@ function restore() {
   if (state.plain === true) set('t-plain', true);
   if (state.tl === true) set('t-tl', true);
   if (state.hover === false) set('t-hover', false);
+  const sizeEl = document.getElementById('sel-size');
   if (state.scale) {
-    const sel = document.getElementById('sel-size');
-    sel.value = state.scale;
+    sizeEl.value = state.scale;
     document.documentElement.style.setProperty('--scale', state.scale);
+  } else if (window.matchMedia('(max-width: 600px)').matches) {
+    sizeEl.value = '1.5';
+    document.documentElement.style.setProperty('--scale', '1.5');
   }
   const sid = state.s && AYAH_COUNTS[state.s] ? state.s : +selS.value;
   const ayah = state.s === sid && state.a ? state.a : 1;
