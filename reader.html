@@ -391,7 +391,22 @@ selA.addEventListener('change', () => goTo(+selS.value, +selA.value));
 const view = document.getElementById('view');
 const msg = document.getElementById('msg');
 const cache = new Map();
+
+// shared across all loaded pages so scrolling through multiple surahs works
 let io = null;
+const seen = new Map();
+
+let lastLoadedSid = 0;
+let loadingNext = false;
+
+// fires when the bottom sentinel of a page nears the viewport — loads next surah
+const bottomIO = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting || loadingNext || lastLoadedSid >= 114) return;
+    bottomIO.unobserve(e.target);
+    appendSurah(lastLoadedSid + 1);
+  });
+}, { rootMargin: '0px 0px 800px 0px' });
 
 function wire(page) {
   const m = page.querySelector('.mushaf');
@@ -412,44 +427,78 @@ function wire(page) {
   });
   m.addEventListener('mouseleave', clear);
 
-  // follow the reader down the page and keep the dropdowns in step
-  if (io) io.disconnect();
-  const seen = new Map();
-  io = new IntersectionObserver(entries => {
-    entries.forEach(e => seen.set(e.target, e.isIntersecting ? e.intersectionRatio : 0));
-    let best = null, bestR = 0;
-    seen.forEach((r, el) => { if (r > bestR) { bestR = r; best = el; } });
-    if (!best || syncing) return;
-    const sid = +best.dataset.s, ayah = +best.dataset.a;
-    selA.value = ayah;
-    state.s = sid; state.a = ayah; save();
-    here.textContent = (SURAH_NAMES[sid] || '') + '  ' + sid + ':' + ayah;
-  }, { rootMargin: '-25% 0px -55% 0px', threshold: [0, .25, .5, 1] });
+  // one persistent IO shared across all pages — keeps dropdowns in sync while scrolling
+  if (!io) {
+    io = new IntersectionObserver(entries => {
+      entries.forEach(e => seen.set(e.target, e.isIntersecting ? e.intersectionRatio : 0));
+      let best = null, bestR = 0;
+      seen.forEach((r, el) => { if (r > bestR) { bestR = r; best = el; } });
+      if (!best || syncing) return;
+      const sid = +best.dataset.s, ayah = +best.dataset.a;
+      if (+selS.value !== sid) { selS.value = sid; fillAyahs(sid, ayah); }
+      else { selA.value = ayah; }
+      state.s = sid; state.a = ayah; save();
+      here.textContent = (SURAH_NAMES[sid] || '') + '  ' + sid + ':' + ayah;
+    }, { rootMargin: '-25% 0px -55% 0px', threshold: [0, .25, .5, 1] });
+  }
   page.querySelectorAll('.ayah').forEach(a => io.observe(a));
+
+  // sentinel at the bottom of this page triggers loading the next surah
+  const sentinel = document.createElement('div');
+  page.appendChild(sentinel);
+  bottomIO.observe(sentinel);
+}
+
+async function fetchSurah(sid) {
+  if (cache.has(sid)) return cache.get(sid);
+  const r = await fetch('surahs/' + sid + '.html');
+  if (!r.ok) throw new Error(r.status);
+  const html = await r.text();
+  cache.set(sid, html);
+  return html;
+}
+
+async function appendSurah(sid) {
+  if (loadingNext || sid < 1 || sid > 114) return;
+  loadingNext = true;
+  try {
+    const html = await fetchSurah(sid);
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    const page = tmp.querySelector('.page');
+    if (page) { view.appendChild(page); lastLoadedSid = sid; wire(page); }
+  } catch (e) {
+    // silent — user can still navigate via dropdown
+  } finally {
+    loadingNext = false;
+  }
 }
 
 async function loadSurah(sid, ayah) {
-  if (cache.has(sid)) {
-    view.innerHTML = cache.get(sid);
-  } else {
-    msg.textContent = 'Loading surah ' + sid + '…';
-    msg.style.display = 'block';
-    try {
-      const r = await fetch('surahs/' + sid + '.html');
-      if (!r.ok) throw new Error(r.status);
-      const html = await r.text();
-      cache.set(sid, html);
-      view.innerHTML = html;
-    } catch (e) {
-      msg.textContent = 'Could not load surah ' + sid +
-        '. Open this page over http, not as a local file.';
-      return;
-    }
+  // reset view and observers for explicit navigation
+  view.innerHTML = '';
+  if (io) { io.disconnect(); io = null; }
+  seen.clear();
+  lastLoadedSid = 0;
+  loadingNext = false;
+
+  msg.textContent = 'Loading surah ' + sid + '…';
+  msg.style.display = 'block';
+  try {
+    const html = await fetchSurah(sid);
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    const page = tmp.querySelector('.page');
+    if (!page) return;
+    view.appendChild(page);
+    lastLoadedSid = sid;
+    msg.style.display = 'none';
+    wire(page);
+    if (ayah) goTo(sid, ayah, false);
+  } catch (e) {
+    msg.textContent = 'Could not load surah ' + sid +
+      '. Open this page over http, not as a local file.';
   }
-  msg.style.display = 'none';
-  const page = view.querySelector('.page');
-  if (page) wire(page);
-  if (ayah) goTo(sid, ayah, false);
 }
 
 function restore() {
