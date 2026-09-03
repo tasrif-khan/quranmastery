@@ -1,4 +1,4 @@
-import json, glob, os, sys, html
+import json, glob, os, sys, html, unicodedata
 
 sys.path.insert(0, 'quran-tajweed-master')
 from tajweed_classifier import label_ayah
@@ -36,6 +36,10 @@ PRIORITY = ["madd_6", "madd_muttasil", "madd_munfasil", "madd_246", "iqlab",
 
 DIGITS = "٠١٢٣٤٥٦٧٨٩"
 FAILED = []
+
+
+def is_combining(ch):
+    return unicodedata.category(ch) in ('Mn', 'Mc', 'Me')
 
 
 def to_arabic_num(n):
@@ -98,14 +102,23 @@ def _span(rule, chunk):
 
 
 def arabic_word(text, owner, ws, we):
+    # Ensure combining marks share the owner of their base character so no
+    # <span> boundary ever falls between a base letter and its diacritics.
+    # Without this the browser's Arabic shaping engine misplaces the marks.
+    eff = list(owner)
+    for i in range(we - 1, ws, -1):
+        if is_combining(text[i]) and eff[i] != eff[i - 1]:
+            if eff[i - 1] is None or is_combining(text[i - 1]):
+                eff[i - 1] = eff[i]
+
     out, i, used = [], ws, set()
     while i < we:
         j = i
-        while j < we and owner[j] == owner[i]:
+        while j < we and eff[j] == eff[i]:
             j += 1
-        if owner[i]:
-            used.add(owner[i])
-        out.append(_span(owner[i], html.escape(text[i:j])))
+        if eff[i]:
+            used.add(eff[i])
+        out.append(_span(eff[i], html.escape(text[i:j])))
         i = j
     return "".join(out), used
 

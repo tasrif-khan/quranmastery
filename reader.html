@@ -90,6 +90,12 @@ body{margin:0;background:#EDEAE1;font-family:"Work Sans",system-ui,sans-serif;co
 
 .mushaf{font-family:"Amiri Quran",Amiri,serif;font-size:var(--ar);line-height:2.7;
   word-spacing:0.08em;text-align:right;padding-top:9mm;transition:font-size .15s ease}
+.bismillah{
+  font-family:"Amiri Quran",Amiri,serif;font-size:calc(var(--ar) * 0.9);
+  text-align:center;color:var(--gold);direction:rtl;
+  padding:6mm 0 5mm;border-bottom:1px solid var(--rule);margin-bottom:5mm;
+  word-spacing:0.12em;line-height:2;
+}
 .ayah{display:inline;scroll-margin-top:calc(var(--bar) + 90px)}
 .ayah-num{font-family:Amiri,serif;font-size:.6em;color:var(--gold);
   border:1px solid var(--gold);border-radius:50%;display:inline-block;
@@ -403,6 +409,43 @@ const seen = new Map();
 let lastLoadedSid = 0;
 let loadingNext = false;
 
+// Prepend a Bismillah header to every surah except 1 (it is ayah 1 there)
+// and 9 (At-Tawbah, which traditionally has no Bismillah).
+function addBismillah(page) {
+  const sid = +page.dataset.s;
+  if (sid === 1 || sid === 9) return;
+  const mushaf = page.querySelector('.mushaf');
+  if (!mushaf) return;
+  const el = document.createElement('div');
+  el.className = 'bismillah';
+  el.textContent = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
+  mushaf.prepend(el);
+}
+
+// Fix combining marks that were wrapped in their own <span> by the build script,
+// which breaks the browser's Arabic shaping engine and misplaces diacritics.
+// Moves the preceding base character into the span so base+marks share one box.
+function fixCombiningMarks(page) {
+  const isCombining = c => {
+    const cp = c.charCodeAt(0);
+    return (cp >= 0x064B && cp <= 0x065F) || cp === 0x0670
+        || (cp >= 0x06D6 && cp <= 0x06DC) || (cp >= 0x06DF && cp <= 0x06E4)
+        || (cp >= 0x06E7 && cp <= 0x06E8);
+  };
+  page.querySelectorAll('.wa [class^="r-"]').forEach(span => {
+    if (!span.textContent || !isCombining(span.textContent[0])) return;
+    const prev = span.previousSibling;
+    if (!prev || prev.nodeType !== Node.TEXT_NODE || !prev.textContent) return;
+    const s = prev.textContent;
+    // Scan back past any trailing combining marks to find the base character.
+    let pos = s.length - 1;
+    while (pos > 0 && isCombining(s[pos])) pos--;
+    // pos is now the base character index; move it and everything after into the span.
+    span.prepend(s.slice(pos));
+    prev.textContent = s.slice(0, pos);
+  });
+}
+
 // fires when the bottom sentinel of a page nears the viewport — loads next surah
 const bottomIO = new IntersectionObserver(entries => {
   entries.forEach(e => {
@@ -413,6 +456,8 @@ const bottomIO = new IntersectionObserver(entries => {
 }, { rootMargin: '0px 0px 800px 0px' });
 
 function wire(page) {
+  addBismillah(page);
+  fixCombiningMarks(page);
   const m = page.querySelector('.mushaf');
   const clear = () => page.querySelectorAll('.hit-leg')
                           .forEach(n => n.classList.remove('hit-leg'));
