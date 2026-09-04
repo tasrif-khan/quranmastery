@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:wght@400;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 @font-face{font-family:"KFGQPC Hafs";src:url("https://cdn.jsdelivr.net/npm/kfgqpc-uthmanic-script-hafs-regular@1.0.0/arabic.otf") format("opentype");font-weight:normal;font-style:normal;font-display:swap}
-:root{--rule:#DCD6C6;--ink:#1B1A17;--paper:#FDFCF8;--gold:#B08C3A;--hl:#FFF3CE;--bar:64px;--ar-base:25px;--scale:1;--ar:calc(var(--ar-base) * var(--scale))}
+:root{--rule:#DCD6C6;--ink:#1B1A17;--paper:#FDFCF8;--gold:#B08C3A;--hl:#FFF3CE;--bar:64px;--ar-base:25px;--scale:1.5;--ar:calc(var(--ar-base) * var(--scale))}
 *{box-sizing:border-box}
 body{margin:0;background:#EDEAE1;font-family:"Work Sans",system-ui,sans-serif;color:var(--ink)}
 
@@ -291,9 +291,9 @@ body.plain .legend{opacity:.25}
     <select id="sel-size" aria-label="Text size">
       <option value="0.75">75%</option>
       <option value="0.9">90%</option>
-      <option value="1" selected>100%</option>
+      <option value="1">100%</option>
       <option value="1.25">125%</option>
-      <option value="1.5">150%</option>
+      <option value="1.5" selected>150%</option>
       <option value="1.75">175%</option>
       <option value="2">200%</option>
       <option value="2.5">250%</option>
@@ -616,7 +616,7 @@ function restore() {
   if (state.scale) {
     sizeEl.value = state.scale;
     document.documentElement.style.setProperty('--scale', state.scale);
-  } else if (window.matchMedia('(max-width: 600px)').matches) {
+  } else {
     sizeEl.value = '1.5';
     document.documentElement.style.setProperty('--scale', '1.5');
   }
