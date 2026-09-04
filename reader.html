@@ -147,6 +147,12 @@ body.hide-madd2 .leg[data-rule="madd_2"]{display:none}
 body.plain .mushaf span[class^="r-"]{color:inherit}
 body.plain .legend{opacity:.25}
 
+#hover-tip{
+  position:fixed;z-index:200;pointer-events:none;display:none;
+  background:#0B211C;color:#DCD8CB;border:1px solid rgba(224,206,147,.3);
+  border-radius:4px;padding:4px 10px;font-size:13px;font-family:"Work Sans",sans-serif;
+  white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+
 @media print{
   body{background:#fff}
   .bar{display:none}
@@ -304,12 +310,19 @@ body.plain .legend{opacity:.25}
   <span class="hint" tabindex="0" data-tip="Madd tabee&#39;i is the plain two count stretch on alif, waw and yaa with no hamza or sukoon after it. It turns up in almost every line, so colouring it can bury the rules that need a decision. Untick to leave it black and keep the page calmer.">?</span>
   <label><input type="checkbox" id="t-plain"> plain text</label>
   <label><input type="checkbox" id="t-tl"> transliteration</label>
-  <label><input type="checkbox" id="t-hover" checked> highlight key on hover</label>
+  <label>on hover
+    <select id="sel-hover">
+      <option value="rule">show rule</option>
+      <option value="tl">transliteration</option>
+      <option value="off">nothing</option>
+    </select>
+  </label>
   <a class="credit" href="https://sporkbots.stream/" target="_blank" rel="noopener">Website and reader by SporkTeam</a>
 </div>
 
 <main id="view"></main>
 <p id="msg" class="msg">Loading&hellip;</p>
+<div id="hover-tip"></div>
 
 <script>
 const b = document.body;
@@ -364,12 +377,17 @@ document.getElementById('t-tl').addEventListener('change', e => {
   b.classList.toggle('show-tl', e.target.checked);
   state.tl = e.target.checked; save();
 });
-document.getElementById('t-hover').addEventListener('change', e => {
-  b.classList.toggle('no-hover', !e.target.checked);
-  state.hover = e.target.checked; save();
-  if (!e.target.checked) document.querySelectorAll('.hit-leg')
-    .forEach(n => n.classList.remove('hit-leg'));
-});
+let hoverMode = 'rule';
+const tip = document.getElementById('hover-tip');
+
+function setHoverMode(mode) {
+  hoverMode = mode;
+  if (mode !== 'rule') document.querySelectorAll('.hit-leg').forEach(n => n.classList.remove('hit-leg'));
+  if (mode !== 'tl') tip.style.display = 'none';
+  state.hoverMode = mode; save();
+}
+
+document.getElementById('sel-hover').addEventListener('change', e => setHoverMode(e.target.value));
 document.getElementById('sel-size').addEventListener('change', e => {
   document.documentElement.style.setProperty('--scale', e.target.value);
   state.scale = e.target.value; save();
@@ -483,19 +501,37 @@ function wire(page) {
   const clear = () => page.querySelectorAll('.hit-leg')
                           .forEach(n => n.classList.remove('hit-leg'));
   m.addEventListener('mouseover', e => {
-    if (b.classList.contains('no-hover')) return;
-    const t = e.target.closest('[data-rule]');
-    clear();
-    if (!t) return;
-    const leg = page.querySelector('.leg[data-rule="' + t.dataset.rule + '"]');
-    if (!leg) return;
-    leg.classList.add('hit-leg');
-    const key = page.querySelector('.key');
-    const kb = key.getBoundingClientRect(), lb = leg.getBoundingClientRect();
-    if (lb.top < kb.top + 28) key.scrollTop -= (kb.top + 28 - lb.top);
-    else if (lb.bottom > kb.bottom - 6) key.scrollTop += (lb.bottom - kb.bottom + 6);
+    if (hoverMode === 'off') return;
+    if (hoverMode === 'rule') {
+      const t = e.target.closest('[data-rule]');
+      clear();
+      if (!t) return;
+      const leg = page.querySelector('.leg[data-rule="' + t.dataset.rule + '"]');
+      if (!leg) return;
+      leg.classList.add('hit-leg');
+      const key = page.querySelector('.key');
+      const kb = key.getBoundingClientRect(), lb = leg.getBoundingClientRect();
+      if (lb.top < kb.top + 28) key.scrollTop -= (kb.top + 28 - lb.top);
+      else if (lb.bottom > kb.bottom - 6) key.scrollTop += (lb.bottom - kb.bottom + 6);
+    } else if (hoverMode === 'tl') {
+      const w = e.target.closest('.w');
+      if (!w) { tip.style.display = 'none'; return; }
+      const wt = w.querySelector('.wt');
+      const text = wt && wt.textContent.trim();
+      if (!text) { tip.style.display = 'none'; return; }
+      tip.textContent = text;
+      tip.style.display = 'block';
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top = (e.clientY - 36) + 'px';
+    }
   });
-  m.addEventListener('mouseleave', clear);
+  m.addEventListener('mousemove', e => {
+    if (hoverMode === 'tl' && tip.style.display === 'block') {
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top = (e.clientY - 36) + 'px';
+    }
+  });
+  m.addEventListener('mouseleave', () => { clear(); tip.style.display = 'none'; });
 
   // one persistent IO shared across all pages — keeps dropdowns in sync while scrolling
   if (!io) {
@@ -611,7 +647,7 @@ function restore() {
   if (state.madd2 === false) set('t-madd2', false);
   if (state.plain === true) set('t-plain', true);
   if (state.tl === true) set('t-tl', true);
-  if (state.hover === false) set('t-hover', false);
+  if (state.hoverMode) { document.getElementById('sel-hover').value = state.hoverMode; hoverMode = state.hoverMode; }
   const sizeEl = document.getElementById('sel-size');
   if (state.scale) {
     sizeEl.value = state.scale;
