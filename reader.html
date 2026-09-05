@@ -72,6 +72,27 @@
   --tip-bg:#1A5048;--tip-fg:#DCF4F0;--tip-border:rgba(128,204,196,.3)
 }
 
+/* ── sage theme ── */
+[data-theme="sage"]{
+  --bg:#E4E8DC;--paper:#F0F4EA;--sidebar-bg:#E8EDE2;
+  --ink:#1A2018;--ink-soft:#384030;--ink-faint:#607058;--muted:#809070;
+  --rule:#C4CEB8;--gold:#5A8030;--gold-soft:#90B860;--hl:#D8EEC8;
+  --bar-bg:#2A3820;--bar-fg:#DDF0D8;--bar-select-bg:#1A2818;
+  --bar-border:rgba(144,184,96,.35);--hint-border:rgba(144,184,96,.55);
+  --hint-hover-bg:rgba(144,184,96,.18);
+  --tip-bg:#2A3820;--tip-fg:#DDF0D8;--tip-border:rgba(144,184,96,.3)
+}
+/* ── midnight theme ── */
+[data-theme="midnight"]{
+  --bg:#0F1A2E;--paper:#162238;--sidebar-bg:#111C30;
+  --ink:#D8E8F8;--ink-soft:#A8C0D8;--ink-faint:#7890A8;--muted:#587090;
+  --rule:#1E304A;--gold:#D0A840;--gold-soft:#E0BC60;--hl:#1E3028;
+  --bar-bg:#070E1C;--bar-fg:#C8DCF0;--bar-select-bg:#0D1828;
+  --bar-border:rgba(208,168,64,.3);--hint-border:rgba(208,168,64,.45);
+  --hint-hover-bg:rgba(208,168,64,.12);
+  --tip-bg:#070E1C;--tip-fg:#C8DCF0;--tip-border:rgba(208,168,64,.3)
+}
+
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);font-family:"Work Sans",system-ui,sans-serif;color:var(--ink);transition:background .2s ease,color .2s ease}
 
@@ -198,15 +219,29 @@ body.show-tl .wt{
 .r-silent{color:#B9BFC4}
 
 /* brighten low-contrast tajweed colors on dark backgrounds */
-[data-theme="dark"] .r-madd_2{color:#9A9590}
-[data-theme="dark"] .r-qalqalah{color:#5A7AFF}
-[data-theme="dark"] .r-hamzat_wasl,[data-theme="dark"] .r-lam_shamsiyyah{color:#9EA5AB}
-[data-theme="dark"] .r-silent{color:#C9CFD4}
+[data-theme="dark"] .r-madd_2,[data-theme="midnight"] .r-madd_2{color:#9A9590}
+[data-theme="dark"] .r-qalqalah,[data-theme="midnight"] .r-qalqalah{color:#5A7AFF}
+[data-theme="dark"] .r-hamzat_wasl,[data-theme="dark"] .r-lam_shamsiyyah,
+[data-theme="midnight"] .r-hamzat_wasl,[data-theme="midnight"] .r-lam_shamsiyyah{color:#9EA5AB}
+[data-theme="dark"] .r-silent,[data-theme="midnight"] .r-silent{color:#C9CFD4}
 
 body.hide-madd2 .r-madd_2{color:inherit}
 body.hide-madd2 .leg[data-rule="madd_2"]{display:none}
 body.plain .mushaf span[class^="r-"]{color:inherit}
 body.plain .legend{opacity:.25}
+body.no-key .margin{display:none}
+
+@media(max-width:640px){
+  .page{flex-direction:column;width:100%;margin:0 0 10px;box-shadow:none}
+  .sheet{order:1;padding:5mm 4mm 10mm}
+  .margin{order:2;width:100%;flex:0 0 auto;border-left:none;border-top:1px solid var(--rule);padding:8px 14px 14px}
+  .key{position:static;max-height:220px}
+  .margin-head{position:static}
+  .bar{padding:9px 12px;gap:8px;font-size:13.5px}
+  .bar select{padding:5px 7px;font-size:13px;max-width:160px}
+  .bar-brand-name{font-size:16px}
+  .here,.credit,.hint{display:none}
+}
 
 #hover-tip{
   position:fixed;z-index:200;pointer-events:none;display:none;
@@ -377,6 +412,8 @@ body.plain .legend{opacity:.25}
       <option value="rose">Rose Gold</option>
       <option value="lavender">Lavender</option>
       <option value="mint">Mint</option>
+      <option value="sage">Sage</option>
+      <option value="midnight">Midnight</option>
     </select>
   </label>
   <label><input type="checkbox" id="t-plain"> plain text</label>
@@ -388,6 +425,7 @@ body.plain .legend{opacity:.25}
       <option value="off">nothing</option>
     </select>
   </label>
+  <label><input type="checkbox" id="t-key" checked> key</label>
   <a class="credit" href="https://sporkbots.stream/" target="_blank" rel="noopener">Website and reader by SporkTeam</a>
 </div>
 
@@ -448,6 +486,11 @@ document.getElementById('t-tl').addEventListener('change', e => {
   b.classList.toggle('show-tl', e.target.checked);
   state.tl = e.target.checked; save();
 });
+document.getElementById('t-key').addEventListener('change', e => {
+  b.classList.toggle('no-key', !e.target.checked);
+  state.key = e.target.checked; save();
+});
+
 function setTheme(t) {
   if (t === 'light') delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = t;
@@ -584,6 +627,7 @@ function wire(page) {
     if (hoverMode === 'rule') {
       const t = e.target.closest('[data-rule]');
       clear();
+      tip.style.display = 'none';
       if (!t) return;
       const leg = page.querySelector('.leg[data-rule="' + t.dataset.rule + '"]');
       if (!leg) return;
@@ -592,6 +636,13 @@ function wire(page) {
       const kb = key.getBoundingClientRect(), lb = leg.getBoundingClientRect();
       if (lb.top < kb.top + 28) key.scrollTop -= (kb.top + 28 - lb.top);
       else if (lb.bottom > kb.bottom - 6) key.scrollTop += (lb.bottom - kb.bottom + 6);
+      const name = leg.querySelector('b');
+      if (name) {
+        tip.textContent = name.textContent;
+        tip.style.display = 'block';
+        tip.style.left = (e.clientX + 14) + 'px';
+        tip.style.top = (e.clientY - 36) + 'px';
+      }
     } else if (hoverMode === 'tl') {
       const w = e.target.closest('.w');
       if (!w) { tip.style.display = 'none'; return; }
@@ -605,7 +656,7 @@ function wire(page) {
     }
   });
   m.addEventListener('mousemove', e => {
-    if (hoverMode === 'tl' && tip.style.display === 'block') {
+    if (tip.style.display === 'block') {
       tip.style.left = (e.clientX + 14) + 'px';
       tip.style.top = (e.clientY - 36) + 'px';
     }
@@ -728,6 +779,9 @@ function restore() {
   if (state.tl === true) set('t-tl', true);
   if (state.hoverMode) { document.getElementById('sel-hover').value = state.hoverMode; hoverMode = state.hoverMode; }
   if (state.theme) { document.getElementById('sel-theme').value = state.theme; setTheme(state.theme); }
+  const isMobile = window.matchMedia('(max-width:640px)').matches;
+  const keyOn = state.key !== undefined ? state.key : !isMobile;
+  if (!keyOn) { document.getElementById('t-key').checked = false; b.classList.add('no-key'); }
   const sizeEl = document.getElementById('sel-size');
   if (state.scale) {
     sizeEl.value = state.scale;
