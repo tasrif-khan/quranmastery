@@ -83,7 +83,9 @@ a{color:var(--green)}
 .nav a{color:var(--text);text-decoration:none;font-size:15px;font-weight:500}
 .nav a:hover{color:var(--green)}
 .nav .btn{color:#fff}
-@media(max-width:640px){.nav a:not(.btn){display:none}}
+.nav-social{display:inline-flex;align-items:center;color:var(--text);transition:color .18s ease}
+.nav-social:hover{color:#1877F2}
+@media(max-width:640px){.nav a:not(.btn):not(.nav-social){display:none}}
 
 /* buttons */
 .btn{
@@ -232,8 +234,20 @@ a{color:var(--green)}
   color:#F2EFE6;background:rgba(255,255,255,.04);
   border:1px solid rgba(224,206,147,.22);padding:26px 24px;text-align:center;
 }
+.reader-sample{font-size:clamp(24px,3.4vw,36px)}
 .reader-sample .s-grey{color:#8E959B}
 .reader-sample .s-amber{color:#D9A106}
+.reader-sample .s-green{color:#2FBF7C}
+.reader-sample .s-orange{color:#F2700A}
+.reader-sample .s-blue{color:#3AB4E6}
+.reader-sample .s-navy{color:#7691FF}
+.reader-sample-key{
+  display:flex;flex-wrap:wrap;gap:10px 18px;justify-content:center;
+  margin-top:18px;font-family:"Work Sans",sans-serif;font-size:12.5px;
+  color:#C6C3B8;letter-spacing:.02em;
+}
+.reader-sample-key span{display:inline-flex;align-items:center;gap:6px}
+.reader-sample-key i{width:9px;height:9px;display:inline-block;border-radius:50%}
 
 /* testimonials */
 .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:44px;margin-top:52px}
@@ -354,6 +368,9 @@ a{color:var(--green)}
       <a href="#courses">Courses</a>
       <a href="#plans">Plans</a>
       <a href="#faq">FAQ</a>
+      <a class="nav-social" href="https://www.facebook.com/profile.php?id=100087888297225" target="_blank" rel="noopener" aria-label="Quran Mastery on Facebook">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.7c0-.9.3-1.5 1.6-1.5h1.7V4.3c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.5H7.7V14h2.7v8h3.1z"/></svg>
+      </a>
       <a class="btn" href="reader.html">Quran Reader</a>
     </nav>
   </div>
@@ -465,8 +482,17 @@ a{color:var(--green)}
         <p>A colour coded Quran you can read in your browser. Every rule is listed beside the text with what it means and how long to hold it. Turn transliteration on and change the text size.</p>
         <a class="btn" href="reader.html">Open the reader</a>
       </div>
-      <div class="reader-sample" dir="rtl" lang="ar" aria-hidden="true">
-        <span class="s-grey">ٱ</span>لْحَمْدُ لِلَّهِ رَبِّ <span class="s-grey">ٱ</span>لْعَٰلَمِ<span class="s-amber">ي</span>نَ
+      <div>
+        <div class="reader-sample" dir="rtl" lang="ar" aria-hidden="true">
+          عَ<span class="s-green">مَّ</span> يَتَسَ<span class="s-orange">آ</span>ءَلُو<span class="s-amber">ن</span>َ ۝ عَ<span class="s-blue">نِ</span> <span class="s-grey">ٱ</span>ل<span class="s-green">نَّ</span>بَإِ <span class="s-grey">ٱ</span>لْعَظِ<span class="s-amber">ي</span>مِ
+        </div>
+        <div class="reader-sample-key" aria-hidden="true">
+          <span><i style="background:#8E959B"></i>silent</span>
+          <span><i style="background:#D9A106"></i>natural madd</span>
+          <span><i style="background:#F2700A"></i>connected madd</span>
+          <span><i style="background:#2FBF7C"></i>ghunnah</span>
+          <span><i style="background:#3AB4E6"></i>ikhfa</span>
+        </div>
       </div>
     </div>
   </section>
