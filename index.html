@@ -348,7 +348,8 @@ a{color:var(--green)}
       "sameAs": [
         "https://www.facebook.com/profile.php?id=100087888297225",
         "https://www.tiktok.com/@learning.quran.ar",
-        "https://www.youtube.com/@thequranmastery6210"
+        "https://www.youtube.com/@thequranmastery6210",
+        "https://www.instagram.com/quranmastry"
       ],
       "founder": {"@id": "https://quranmastery.com/#teacher"},
       "employee": {"@id": "https://quranmastery.com/#teacher"}
@@ -425,6 +426,9 @@ a{color:var(--green)}
       </a>
       <a class="nav-social" href="https://www.youtube.com/@thequranmastery6210" target="_blank" rel="noopener" aria-label="Quran Mastery on YouTube">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.5 12 4.5 12 4.5s-7 0-8.9.6A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12 31 31 0 0 0 1 16.8a3 3 0 0 0 2.1 2.1c1.9.6 8.9.6 8.9.6s7 0 8.9-.6a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.75 15.5v-7l6 3.5-6 3.5z"/></svg>
+      </a>
+      <a class="nav-social" href="https://www.instagram.com/quranmastry" target="_blank" rel="noopener" aria-label="Quran Mastery on Instagram">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
       </a>
       <a class="btn" href="reader.html">Quran Reader</a>
     </nav>
@@ -755,7 +759,8 @@ a{color:var(--green)}
       <a href="#faq">FAQ</a> &nbsp;
       <a href="https://www.facebook.com/profile.php?id=100087888297225" target="_blank" rel="noopener" aria-label="Quran Mastery on Facebook">Facebook</a> &nbsp;
       <a href="https://www.tiktok.com/@learning.quran.ar" target="_blank" rel="noopener" aria-label="Quran Mastery on TikTok">TikTok</a> &nbsp;
-      <a href="https://www.youtube.com/@thequranmastery6210" target="_blank" rel="noopener" aria-label="Quran Mastery on YouTube">YouTube</a>
+      <a href="https://www.youtube.com/@thequranmastery6210" target="_blank" rel="noopener" aria-label="Quran Mastery on YouTube">YouTube</a> &nbsp;
+      <a href="https://www.instagram.com/quranmastry" target="_blank" rel="noopener" aria-label="Quran Mastery on Instagram">Instagram</a>
     </span>
   </div>
 </footer>
@@ -766,7 +771,6 @@ a{color:var(--green)}
     const overlay = card.querySelector('.lesson-overlay');
     if (!video || !overlay) return;
     overlay.addEventListener('click', e => { e.stopPropagation(); video.play(); });
-    video.addEventListener('click', () => { video.paused ? video.play() : video.pause(); });
     video.addEventListener('play',  () => card.classList.add('is-playing'));
     video.addEventListener('pause', () => card.classList.remove('is-playing'));
     video.addEventListener('ended', () => card.classList.remove('is-playing'));
