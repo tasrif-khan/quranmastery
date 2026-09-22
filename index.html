@@ -272,7 +272,7 @@ a{color:var(--green)}
 .lesson-card video{display:block;width:100%;height:auto;aspect-ratio:9/16;object-fit:cover;background:#000}
 .lesson-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
   background:linear-gradient(180deg,rgba(15,46,39,.55) 0%,rgba(15,46,39,.75) 100%);color:#FCFAF3;
-  transition:opacity .25s ease;pointer-events:none;padding:24px;text-align:center}
+  transition:opacity .25s ease;cursor:pointer;padding:24px;text-align:center}
 .lesson-label{font-family:'Work Sans',sans-serif;font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#FCFAF3}
 .lesson-play{display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:50%;
   background:var(--gold);color:#0F2E27;box-shadow:0 6px 22px rgba(0,0,0,.35)}
@@ -347,7 +347,8 @@ a{color:var(--green)}
       },
       "sameAs": [
         "https://www.facebook.com/profile.php?id=100087888297225",
-        "https://www.tiktok.com/@learning.quran.ar"
+        "https://www.tiktok.com/@learning.quran.ar",
+        "https://www.youtube.com/@thequranmastery6210"
       ],
       "founder": {"@id": "https://quranmastery.com/#teacher"},
       "employee": {"@id": "https://quranmastery.com/#teacher"}
@@ -421,6 +422,9 @@ a{color:var(--green)}
       </a>
       <a class="nav-social" href="https://www.tiktok.com/@learning.quran.ar" target="_blank" rel="noopener" aria-label="Quran Mastery on TikTok">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.5 2h-3v13.2a2.7 2.7 0 1 1-2.7-2.7c.3 0 .6 0 .8.1V9.5a5.8 5.8 0 0 0-.8-.1 5.7 5.7 0 1 0 5.7 5.7V8.5a7.3 7.3 0 0 0 4.3 1.4V6.8a4.3 4.3 0 0 1-4.3-4.3z"/></svg>
+      </a>
+      <a class="nav-social" href="https://www.youtube.com/@thequranmastery6210" target="_blank" rel="noopener" aria-label="Quran Mastery on YouTube">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.5 12 4.5 12 4.5s-7 0-8.9.6A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12 31 31 0 0 0 1 16.8a3 3 0 0 0 2.1 2.1c1.9.6 8.9.6 8.9.6s7 0 8.9-.6a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.75 15.5v-7l6 3.5-6 3.5z"/></svg>
       </a>
       <a class="btn" href="reader.html">Quran Reader</a>
     </nav>
@@ -750,7 +754,8 @@ a{color:var(--green)}
       <a href="#plans">Plans</a> &nbsp;
       <a href="#faq">FAQ</a> &nbsp;
       <a href="https://www.facebook.com/profile.php?id=100087888297225" target="_blank" rel="noopener" aria-label="Quran Mastery on Facebook">Facebook</a> &nbsp;
-      <a href="https://www.tiktok.com/@learning.quran.ar" target="_blank" rel="noopener" aria-label="Quran Mastery on TikTok">TikTok</a>
+      <a href="https://www.tiktok.com/@learning.quran.ar" target="_blank" rel="noopener" aria-label="Quran Mastery on TikTok">TikTok</a> &nbsp;
+      <a href="https://www.youtube.com/@thequranmastery6210" target="_blank" rel="noopener" aria-label="Quran Mastery on YouTube">YouTube</a>
     </span>
   </div>
 </footer>
@@ -760,9 +765,6 @@ a{color:var(--green)}
     const video = card.querySelector('video');
     const overlay = card.querySelector('.lesson-overlay');
     if (!video || !overlay) return;
-    overlay.style.pointerEvents = 'auto';
-    overlay.style.cursor = 'pointer';
-    card.style.cursor = 'pointer';
     overlay.addEventListener('click', e => { e.stopPropagation(); video.play(); });
     video.addEventListener('click', () => { video.paused ? video.play() : video.pause(); });
     video.addEventListener('play',  () => card.classList.add('is-playing'));
