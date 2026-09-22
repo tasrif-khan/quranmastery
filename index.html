@@ -25,9 +25,8 @@
 <meta name="twitter:description" content="One on one Quran, Tajweed and Arabic lessons taught live by native Arabic speakers. Free 30 minute trial.">
 <meta name="twitter:image" content="https://quranmastery.com/og-image.jpg">
 
-<link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -250,6 +249,30 @@ a{color:var(--green)}
 .reader-sample-key i{width:9px;height:9px;display:inline-block;border-radius:50%}
 
 /* testimonials */
+/* teacher */
+.teacher-in{display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:center}
+@media(max-width:820px){.teacher-in{grid-template-columns:1fr;gap:32px}}
+.teacher-photo img{width:100%;height:auto;display:block;border:1px solid var(--rule);filter:sepia(.05)}
+.teacher-body p{margin:0 0 14px;max-width:56ch;font-size:17px;color:var(--text)}
+.teacher-body p strong{color:var(--ink);font-weight:600}
+.teacher-body p:last-child{color:var(--text-soft)}
+.teacher-specs{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 22px;max-width:56ch}
+.teacher-specs span{font-size:13px;letter-spacing:.02em;color:var(--ink);background:var(--paper-2);border:1px solid var(--rule);padding:5px 11px;border-radius:999px}
+
+/* lessons video */
+.lessons{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:44px}
+@media(max-width:820px){.lessons{grid-template-columns:1fr;gap:22px}}
+.lesson-card{position:relative;background:var(--ink);border:1px solid var(--rule);overflow:hidden}
+.lesson-card video{display:block;width:100%;height:auto;aspect-ratio:9/16;object-fit:cover;background:#000}
+.lesson-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:linear-gradient(180deg,rgba(15,46,39,.55) 0%,rgba(15,46,39,.75) 100%);color:#FCFAF3;
+  transition:opacity .25s ease;pointer-events:none;padding:24px;text-align:center}
+.lesson-label{font-family:'Work Sans',sans-serif;font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#FCFAF3}
+.lesson-play{display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:50%;
+  background:var(--gold);color:#0F2E27;box-shadow:0 6px 22px rgba(0,0,0,.35)}
+.lesson-card.is-playing .lesson-overlay,
+.lesson-card video:not([paused]) + .lesson-overlay{opacity:0}
+
 .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:44px;margin-top:52px}
 @media(max-width:820px){.quotes{grid-template-columns:1fr;gap:34px}}
 .quote{border-left:2px solid var(--gold);padding-left:22px}
@@ -318,8 +341,27 @@ a{color:var(--green)}
         "availableLanguage": ["English", "Arabic"]
       },
       "sameAs": [
-        "https://www.facebook.com/profile.php?id=100087888297225"
-      ]
+        "https://www.facebook.com/profile.php?id=100087888297225",
+        "https://www.tiktok.com/@learning.quran.ar"
+      ],
+      "founder": {"@id": "https://quranmastery.com/#teacher"},
+      "employee": {"@id": "https://quranmastery.com/#teacher"}
+    },
+    {
+      "@type": "Person",
+      "@id": "https://quranmastery.com/#teacher",
+      "name": "Taha Elshimy",
+      "image": "https://quranmastery.com/teacher.jpg",
+      "jobTitle": "Quran, Tajweed and Arabic Teacher",
+      "description": "Graduate of the Faculty of Languages and Translation at Al-Azhar University, with 6 years of experience teaching Quran, Arabic and Islamic studies. Holds an Ijazah in Hafs 'an 'Asim.",
+      "knowsAbout": ["Quran recitation", "Tajweed", "Hafs 'an 'Asim", "Islamic Studies", "Arabic Language", "Noor Al-Bayan"],
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "Al-Azhar University, Faculty of Languages and Translation",
+        "address": {"@type": "PostalAddress", "addressLocality": "Cairo", "addressCountry": "EG"}
+      },
+      "worksFor": {"@id": "https://quranmastery.com/#org"},
+      "knowsLanguage": ["Arabic", "English"]
     },
     {
       "@type": "WebSite",
@@ -366,10 +408,14 @@ a{color:var(--green)}
     </a>
     <nav class="nav" aria-label="Main">
       <a href="#courses">Courses</a>
+      <a href="#teacher">Teacher</a>
       <a href="#plans">Plans</a>
       <a href="#faq">FAQ</a>
       <a class="nav-social" href="https://www.facebook.com/profile.php?id=100087888297225" target="_blank" rel="noopener" aria-label="Quran Mastery on Facebook">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.7c0-.9.3-1.5 1.6-1.5h1.7V4.3c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.5H7.7V14h2.7v8h3.1z"/></svg>
+      </a>
+      <a class="nav-social" href="https://www.tiktok.com/@learning.quran.ar" target="_blank" rel="noopener" aria-label="Quran Mastery on TikTok">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.5 2h-3v13.2a2.7 2.7 0 1 1-2.7-2.7c.3 0 .6 0 .8.1V9.5a5.8 5.8 0 0 0-.8-.1 5.7 5.7 0 1 0 5.7 5.7V8.5a7.3 7.3 0 0 0 4.3 1.4V6.8a4.3 4.3 0 0 1-4.3-4.3z"/></svg>
       </a>
       <a class="btn" href="reader.html">Quran Reader</a>
     </nav>
@@ -492,6 +538,69 @@ a{color:var(--green)}
           <span><i style="background:#F2700A"></i>connected madd</span>
           <span><i style="background:#2FBF7C"></i>ghunnah</span>
           <span><i style="background:#3AB4E6"></i>ikhfa</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="teacher">
+    <div class="wrap teacher-in">
+      <div class="teacher-photo">
+        <img src="teacher.jpg" alt="Taha Elshimy, Quran Mastery teacher" loading="lazy" width="420" height="520">
+      </div>
+      <div class="teacher-body">
+        <div class="shead" style="text-align:left">
+          <h2>Meet your teacher</h2>
+        </div>
+        <p><strong>Taha Elshimy</strong> is a graduate of the Faculty of Languages and Translation at Al-Azhar University, with six years of experience teaching the Quran, Arabic language and Islamic studies to learners of every level.</p>
+        <p>He holds an Ijazah in Hafs &lsquo;an &lsquo;Asim and specialises in helping students build a strong foundation in Quran reading and recitation.</p>
+        <div class="teacher-specs">
+          <span>Quran Reading &amp; Recitation</span>
+          <span>Tajweed</span>
+          <span>Hafs &lsquo;an &lsquo;Asim</span>
+          <span>Islamic Studies</span>
+          <span>Arabic Language</span>
+          <span>Noor Al-Bayan for Beginners</span>
+        </div>
+        <p>His approach is clear, patient and gradual, so students grow in confidence lesson by lesson and their Quran and Arabic improve step by step.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper2" id="lessons">
+    <div class="wrap">
+      <div class="shead">
+        <h2>See a lesson in action</h2>
+        <p>A short look inside a real one on one session.</p>
+      </div>
+      <div class="lessons">
+        <div class="lesson-card">
+          <video preload="metadata" playsinline controls>
+            <source src="exampleclass2.mp4" type="video/mp4">
+          </video>
+          <div class="lesson-overlay" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 40 40" aria-hidden="true">
+              <path d="M4 11c5-2.5 10-2.5 16 1v25c-6-3.5-11-3.5-16-1V11z" fill="#1B5E4B"/>
+              <path d="M36 11c-5-2.5-10-2.5-16 1v25c6-3.5 11-3.5 16-1V11z" fill="#154A3B"/>
+              <path d="M20 2l2.6 4.6L28 8l-3.5 4.2.6 5.4L20 15.4l-5.1 2.2.6-5.4L12 8l5.4-1.4L20 2z" fill="#C0932F"/>
+            </svg>
+            <span class="lesson-label">View example class</span>
+            <span class="lesson-play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7L8 5z"/></svg></span>
+          </div>
+        </div>
+        <div class="lesson-card">
+          <video preload="metadata" playsinline controls>
+            <source src="exampleclass1.mp4" type="video/mp4">
+          </video>
+          <div class="lesson-overlay" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 40 40" aria-hidden="true">
+              <path d="M4 11c5-2.5 10-2.5 16 1v25c-6-3.5-11-3.5-16-1V11z" fill="#1B5E4B"/>
+              <path d="M36 11c-5-2.5-10-2.5-16 1v25c6-3.5 11-3.5 16-1V11z" fill="#154A3B"/>
+              <path d="M20 2l2.6 4.6L28 8l-3.5 4.2.6 5.4L20 15.4l-5.1 2.2.6-5.4L12 8l5.4-1.4L20 2z" fill="#C0932F"/>
+            </svg>
+            <span class="lesson-label">View example class</span>
+            <span class="lesson-play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7L8 5z"/></svg></span>
+          </div>
         </div>
       </div>
     </div>
@@ -631,12 +740,28 @@ a{color:var(--green)}
     <span>Quran Mastery</span>
     <span>
       <a href="#courses">Courses</a> &nbsp;
+      <a href="#teacher">Teacher</a> &nbsp;
       <a href="#plans">Plans</a> &nbsp;
       <a href="#faq">FAQ</a> &nbsp;
-      <a href="https://www.facebook.com/profile.php?id=100087888297225" target="_blank" rel="noopener" aria-label="Quran Mastery on Facebook">Facebook</a>
+      <a href="https://www.facebook.com/profile.php?id=100087888297225" target="_blank" rel="noopener" aria-label="Quran Mastery on Facebook">Facebook</a> &nbsp;
+      <a href="https://www.tiktok.com/@learning.quran.ar" target="_blank" rel="noopener" aria-label="Quran Mastery on TikTok">TikTok</a>
     </span>
   </div>
 </footer>
+
+<script>
+  document.querySelectorAll('.lesson-card').forEach(card => {
+    const video = card.querySelector('video');
+    const overlay = card.querySelector('.lesson-overlay');
+    if (!video || !overlay) return;
+    overlay.style.pointerEvents = 'auto';
+    overlay.style.cursor = 'pointer';
+    overlay.addEventListener('click', () => { video.play(); });
+    video.addEventListener('play',  () => card.classList.add('is-playing'));
+    video.addEventListener('pause', () => card.classList.remove('is-playing'));
+    video.addEventListener('ended', () => card.classList.remove('is-playing'));
+  });
+</script>
 
 </body>
 </html>
