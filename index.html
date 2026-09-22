@@ -762,7 +762,9 @@ a{color:var(--green)}
     if (!video || !overlay) return;
     overlay.style.pointerEvents = 'auto';
     overlay.style.cursor = 'pointer';
-    overlay.addEventListener('click', () => { video.play(); });
+    card.style.cursor = 'pointer';
+    overlay.addEventListener('click', e => { e.stopPropagation(); video.play(); });
+    video.addEventListener('click', () => { video.paused ? video.play() : video.pause(); });
     video.addEventListener('play',  () => card.classList.add('is-playing'));
     video.addEventListener('pause', () => card.classList.remove('is-playing'));
     video.addEventListener('ended', () => card.classList.remove('is-playing'));
