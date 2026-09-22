@@ -270,8 +270,7 @@ a{color:var(--green)}
 .lesson-label{font-family:'Work Sans',sans-serif;font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#FCFAF3}
 .lesson-play{display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:50%;
   background:var(--gold);color:#0F2E27;box-shadow:0 6px 22px rgba(0,0,0,.35)}
-.lesson-card.is-playing .lesson-overlay,
-.lesson-card video:not([paused]) + .lesson-overlay{opacity:0}
+.lesson-card.is-playing .lesson-overlay{opacity:0;pointer-events:none}
 
 .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:44px;margin-top:52px}
 @media(max-width:820px){.quotes{grid-template-columns:1fr;gap:34px}}
